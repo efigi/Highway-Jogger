@@ -202,4 +202,18 @@ public class Move : MonoBehaviour
     {
         return GetLanePosX(targetLane) > transform.position.x;
     }
+
+    public void GetLeanSwipe(Vector2 delta)
+    {
+        Debug.Log(delta);
+        if (delta.x < 0)
+        {
+            moveBuffer = -1;
+        }
+        else if (delta.x > 0)
+        {
+            moveBuffer = 1;
+        }
+    }
+  
 }

@@ -73,7 +73,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3efcbe27c6e34c269a5eba58f05eaaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pickupParticle: {fileID: 165696696497947847, guid: b762f045b79974cb89bc88a047aa2bb8,
+  pickupParticle: {fileID: 198662263970059650, guid: 5b8f26e51801c47879af2ba49ca5c413,
     type: 3}
 --- !u!1001 &8152344874327698554
 PrefabInstance:

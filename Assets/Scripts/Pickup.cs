@@ -24,7 +24,8 @@ public class Pickup : MonoBehaviour
             if (pickupParticle)
             {
                 //TODO add particle shiz
-                Instantiate(pickupParticle, transform.position, Quaternion.identity);
+                ParticleSystem newParticle = Instantiate(pickupParticle, transform.position, Quaternion.identity);
+                newParticle.transform.parent = other.gameObject.transform;
             }
             Destroy(gameObject);
             //gameObject.SetActive(false);
