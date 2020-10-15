@@ -9,7 +9,8 @@ public class Move : MonoBehaviour
     public float edgeDistance;
 
     private float sideMovementSpeed = 5.0f;
-    private float jumpHeight = 5.0f;
+    private float jumpHeight = 2.0f;
+    private bool reachedMaxHeight = false;
     private int moveBuffer = 0;
     private float laneDistance = 4.5f;
 
@@ -66,16 +67,34 @@ public class Move : MonoBehaviour
         {
             case States.Jumping:
 
-                if (jumpHeight > transform.position.y)
+                if (!reachedMaxHeight)
                 {
                     targetPosition = TranslatedPosition(targetPosition, 0, Mathf.Lerp(0, jumpHeight, jumpHeight * Time.deltaTime), 0);
+                    if (jumpHeight < transform.position.y)
+                    {
+                        reachedMaxHeight = true;
+                    }
                     //targetPosition = TranslatedPosition(targetPosition, 10 * Vector3.down * Time.deltaTime);
+                }
+                else
+                {
+                    if (controller.isGrounded)
+                    {
+                        reachedMaxHeight = false;
+                        state = States.Running;
+                        animator.SetBool("Jump", false);
+                    }
+                    else
+                    {
+                        targetPosition = TranslatedPosition(targetPosition, 0, Mathf.Lerp(0, -jumpHeight, -jumpHeight * Time.deltaTime), 0);
+                    }
+
                 }
                 break;
             case States.Running:
                 if (InputJump())// && controller.isGrounded)
                 {
-                    animator.SetBool("Jump", true);
+                    animator.SetTrigger("Jump");
                     //targetPosition = TranslatedPosition(targetPosition, 0, Mathf.Lerp(0,jumpHeight, jumpHeight * Time.deltaTime), 0);
                     state = States.Jumping;
                 }
