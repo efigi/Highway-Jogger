@@ -9,6 +9,7 @@ public class Move : MonoBehaviour
     public float edgeDistance;
 
     private float sideMovementSpeed = 5.0f;
+    private float jumpHeight = 5.0f;
     private int moveBuffer = 0;
     private float laneDistance = 4.5f;
 
@@ -22,6 +23,16 @@ public class Move : MonoBehaviour
     }
     private Lanes currentLane = Lanes.Middle;
     private Lanes targetLane = Lanes.Middle;
+
+    public enum States: int
+    {
+        Idle = 0,
+        Running = 1,
+        RunningLeft = 2,
+        RunningRight = 3,
+        Jumping = 4
+    }
+    private States state = States.Idle;
 
     private Vector3 targetPosition;
     private CharacterController controller;
@@ -40,59 +51,90 @@ public class Move : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
+        state = States.Running;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         targetPosition = TranslatedPosition(Vector3.zero, direction * speed * Time.deltaTime);
-        if (InputLeft() && targetLane != Lanes.Left)
-        {
-            if (InTargetLane())
-            {
-                targetLane -= 1;
-                moveBuffer = 0;
-                animator.SetBool("Run Left", true);
-                //Debug.Log(targetLane);
 
-            }
-            else if (moveBuffer == 0 && NearTargetLane())// HeadingRight())
-            {
-                moveBuffer = -1;
-            }
+        //add gravity
+        
 
-        }
-        else if (InputRight() && targetLane != Lanes.Right)
+        switch (state)
         {
-            if (InTargetLane())
-            {
-                targetLane += 1;
-                moveBuffer = 0;
-                animator.SetBool("Run Right", true);
-                //Debug.Log(targetLane);
-            }
-            else if (moveBuffer == 0 && NearTargetLane())//HeadingLeft())
-            {
-                moveBuffer = 1;
-            }
-        }
+            case States.Jumping:
 
-        if (HeadingLeft()) //ie heading left
-        {
-            targetPosition = TranslatedPosition(targetPosition, laneDistance * sideMovementSpeed * Vector3.left * Time.deltaTime);
+                if (jumpHeight > transform.position.y)
+                {
+                    targetPosition = TranslatedPosition(targetPosition, 0, Mathf.Lerp(0, jumpHeight, jumpHeight * Time.deltaTime), 0);
+                    //targetPosition = TranslatedPosition(targetPosition, 10 * Vector3.down * Time.deltaTime);
+                }
+                break;
+            case States.Running:
+                if (InputJump())// && controller.isGrounded)
+                {
+                    animator.SetBool("Jump", true);
+                    //targetPosition = TranslatedPosition(targetPosition, 0, Mathf.Lerp(0,jumpHeight, jumpHeight * Time.deltaTime), 0);
+                    state = States.Jumping;
+                }
+                else if (InputLeft() && targetLane != Lanes.Left)
+                {
 
-        }
-        else if (HeadingRight()) //ie heading right
-        {
-            targetPosition = TranslatedPosition(targetPosition, laneDistance * sideMovementSpeed * Vector3.right * Time.deltaTime);
+                    targetLane -= 1;
+                    moveBuffer = 0;
+                    animator.SetBool("Run Left", true);
+                    state = States.RunningLeft;
+                }
+                else if (InputRight() && targetLane != Lanes.Right)
+                {
+                    targetLane += 1;
+                    moveBuffer = 0;
+                    animator.SetBool("Run Right", true);
+                    state = States.RunningRight;
+                }
+                break;
+            case States.RunningLeft:
+            case States.RunningRight:
+                if (InTargetLane())
+                {
+                    currentLane = targetLane;
+                    animator.SetBool("Run Right", false);
+                    animator.SetBool("Run Left", false);
+                    state = States.Running;
+                    break;
+                }
+                else if (HeadingLeft()) //ie heading left
+                {
+                    targetPosition = TranslatedPosition(targetPosition, laneDistance * sideMovementSpeed * Vector3.left * Time.deltaTime);
 
+                }
+                else if (HeadingRight()) //ie heading right
+                {
+                    targetPosition = TranslatedPosition(targetPosition, laneDistance * sideMovementSpeed * Vector3.right * Time.deltaTime);
+                }
+
+                if (InputLeft() && targetLane != Lanes.Left)
+                {
+                    if (moveBuffer == 0 && NearTargetLane())// HeadingRight())
+                    {
+                        moveBuffer = -1;
+                    }
+
+                }
+                else if (InputRight() && targetLane != Lanes.Right)
+                {
+                    if (moveBuffer == 0 && NearTargetLane())//HeadingLeft())
+                    {
+                        moveBuffer = 1;
+                    }
+                }
+                break;
+            case States.Idle:
+                break;
         }
-        else
-        {
-            currentLane = targetLane;
-            animator.SetBool("Run Right", false);
-            animator.SetBool("Run Left", false);
-        }
+        
 
         if (transform.position.z >= edgeDistance)
         {
@@ -102,8 +144,12 @@ public class Move : MonoBehaviour
         }
 
         controller.Move(targetPosition);
-        //controller.Move(direction * speed * Time.deltaTime);
-        
+        if (state == States.Jumping && controller.isGrounded)
+        {
+            state = States.Running;
+            animator.SetBool("Jump", false);
+
+        }
     }
 
     Vector3 TranslatedPosition(Vector3 initialPosition, float x, float y, float z)
@@ -130,7 +176,7 @@ public class Move : MonoBehaviour
     {
         float dist = Mathf.Abs(GetLanePosX(targetLane) - transform.position.x);
         Debug.Log(dist);
-        return dist < laneDistance/2;
+        return dist < laneDistance/1.5;
     }
 
     bool InputLeft()
@@ -143,6 +189,10 @@ public class Move : MonoBehaviour
         return Input.GetKeyDown(KeyCode.D) || moveBuffer == 1;
     }
 
+    bool InputJump()
+    {
+        return Input.GetKeyDown(KeyCode.W);
+    }
     bool HeadingLeft()
     {
         return GetLanePosX(targetLane) < transform.position.x;
@@ -153,4 +203,3 @@ public class Move : MonoBehaviour
         return GetLanePosX(targetLane) > transform.position.x;
     }
 }
-
