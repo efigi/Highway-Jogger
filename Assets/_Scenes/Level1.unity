@@ -5528,6 +5528,7 @@ GameObject:
   - component: {fileID: 2142304705}
   - component: {fileID: 2142304707}
   - component: {fileID: 2142304706}
+  - component: {fileID: 2142304708}
   m_Layer: 5
   m_Name: Score Text
   m_TagString: Untagged
@@ -5551,7 +5552,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -399.98, y: -70.7}
+  m_AnchoredPosition: {x: -399.97998, y: -70.700195}
   m_SizeDelta: {x: 800.0498, y: 141.43837}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2142304706
@@ -5586,7 +5587,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 00234
+  m_Text: 0
 --- !u!222 &2142304707
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5595,6 +5596,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2142304704}
   m_CullTransparentMesh: 0
+--- !u!114 &2142304708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142304704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 853181da6efc84929a3de074c5177144, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textToIncrease: {fileID: 2142304706}
+  currentValue: 0
+  increment: 1
+  setTime: 0.05
 --- !u!4 &543450652330095134 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5094480193041348651, guid: 9b54311b91ee946f38d1f4fc4f347a76,
